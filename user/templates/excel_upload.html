@@ -1,0 +1,184 @@
+ <style>
+ .loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  display:none;
+   position: absolute;
+    left: 45%;
+    top: 35%;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+ 
+    button{
+        width: 40%;
+    background-color: #FF6491;
+    color: white;
+    padding: 2%;
+    font-size: 20px;
+    /* margin-top: -4%; */
+    border: 1px solid #FF6491;
+    border-radius: 5px;
+    cursor: pointer;
+    }
+    /* button:hover{
+        cursor: pointer;
+        background-color: lightgreen;
+    } */
+    html{
+        background-image: url("/static/6.jpg");
+        background-repeat: no-repeat;
+        background-size:cover;
+    }
+    body{
+        /* background-color: #d3dada;
+        margin-left: 20%;
+        border: 15px solid white; */
+        text-align: center;
+        /* width: 60%; */
+        /* height: 100%; */
+    }
+    h1{
+        color: #241e8a;;
+        margin-top: 0px;
+        font-size: 42px;
+        font-weight: bolder;
+    }
+    label{
+        text-decoration-line: underline;
+        color: #FF6491;
+        font-size: large;
+    }
+    input[type=file]{
+        /* margin-top: 2%;
+        margin-left: 23%;
+        font-size: 25px; */
+        font-size: 17px;
+    margin-top: 2rem;
+    margin-left: 5rem;
+
+    }
+    input[type=file]::after{
+        color:red;
+    }
+    #x{
+        margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+    p{
+        text-align: center;
+        color: #FF6491;
+        margin-top: 3rem;
+        font-size: 23px;
+    }
+    .avatar {
+        /* position: relative;
+        vertical-align: middle;
+        width: 131px;
+        height: 91px;
+        border-radius: 50%; */
+        width: 100%;
+    }
+    .container-shadidata{
+        /* background-color: #cecece; */
+    /* width: 60%; */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    /* justify-content: center; */
+    height: 100%;
+    }
+    .content-container{
+        background-color: #EEECED;
+        width: 60%; 
+        border-radius: 10px;
+        height: 85%;
+        display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    }
+    .excel-image-comtainer{
+        width: 125px;
+    height: 100px;
+}
+.logo-container{
+    text-align: left;
+    width: 135px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding-left: 3rem;
+}
+.logo-container img{
+    width: 100%;
+}
+    }
+    
+   
+
+</style>
+<!-- {% if messages %}
+    {% for message in messages %}
+        <div>
+            <strong>{{message|safe}}</strong>
+        </div>
+    {% endfor %}
+{% else %}
+{{order}} -->
+ <div class="loader" id="loaderDiv"></div>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <body>
+        <div class="logo-container">
+            <img src="https://admin.shadiram.in/assets/img/Group%2014395.png" />
+        </div>
+        <div class="container-shadidata">
+            <div class="content-container">
+            <h1>Shadiram Data Upload</h1>
+            <label for=""><b>Upload a file</b></label>
+            <div id="x">
+                <div class="excel-image-comtainer">
+                    <img src="https://img.icons8.com/color/480/undefined/ms-excel.png" alt="Avatar" class="avatar">
+                </div>
+ 
+                <input type="file" name="file" id="file" required = required><br>
+            </div>
+            <p>
+                Please upload your shadiram data sheet. 
+            </p>
+            <br>
+            <br>
+            <button type="submit" onclick="showDiv()"><b>Upload</b></button>
+        </div>
+    </div>
+      
+    </body>
+</form>
+
+<script>
+function showDiv() {
+    if(document.getElementById("file").value != "") {
+   // you have a file
+     document.getElementById('loaderDiv').style.display = "block";
+}
+ 
+}
+</script>
+<!-- {% endif %} -->
