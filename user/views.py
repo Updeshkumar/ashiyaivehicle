@@ -26,7 +26,7 @@ from django.http import HttpResponse
 from dotenv import dotenv_values
 config = dotenv_values(".env")
 import requests
-from user.models import User, Device, MasterContents, Device, heavyvehivalregistration, Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, labour_contructor, Requirement
+from user.models import User, Device, MasterContents, Device, heavyvehivalregistration,Request_SubContractor, Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, labour_contructor, Requirement, Request_labour_contructor, Request_driver_Operator
 import razorpay
 import random
 from api.settings import image_uploadPath
@@ -38,6 +38,9 @@ razorpay_client = razorpay.Client(auth=("rzp_live_H6G6PNWGPU3vwq", "djfo8LPqdP6V
 # Create your views here.
 ################# import filter functions ##################
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics
+from user.serializers import ProfileSerializer
+from rest_framework.views import APIView 
 
 
 # This method default view in thee main screen
@@ -221,8 +224,6 @@ def filter_data(request):  # get studies
             _result = db.readProcedureJson('getHeavyVehicles',[])
         if request.GET['type'] == 'labour':
             _result = db.readProcedureJson('getLabours',[])
-        if request.GET['type'] == 'subcontractor':
-            _result = db.readProcedureJson('subOperator',[])
         db.commit()
 
         if len(_result)>0:
@@ -724,8 +725,10 @@ def capturePayment(request):
 def uploadFile(request):
     try:
         imageRawFile = request.FILES['file']
+        print(imageRawFile)
         fileType = request.data.get("fileType")
         unique_filename = str(uuid.uuid4())+str(imageRawFile)
+        print(image_uploadPath)
         with open(str(image_uploadPath)+str(unique_filename), 'wb') as desk:
             for chunk in imageRawFile.chunks():
                 desk.write(chunk)
@@ -736,17 +739,19 @@ def uploadFile(request):
 
 ################heavyVehicalregistrations ##########
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 @isAuthenticate 
 def hvregistration(request):
     try:
         schema = {
             "vehical_name": {'type': 'string', 'required': True, 'nullable': False},
+            "company_name": {'type': 'string', 'required': True, 'nullable': False},
             "vehical_number": {'type': 'integer', 'required': True, 'nullable': False},
             "model_number": {'type': 'integer', 'required': False, 'nullable': True},
             "ownername": {'type': 'string', 'required': False, 'nullable': True},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
-            "vehicle_image": {'type': 'file', 'required': False, 'nullable': True},
+            "vehicle_image": {'type': 'string', 'required': False, 'nullable': True},
+            "manufectoring_date": {'type': 'string', 'required': True, 'nullable': False},
 
         }
         v = Validator()
@@ -759,18 +764,23 @@ def hvregistration(request):
         # Create database connection
         db = SqlQueryBuilder()
         vehical_name = request.data['vehical_name']
+        company_name = request.data['company_name']
         vehical_number = request.data['vehical_number']
         model_number = request.data['model_number']
         ownername = request.data['ownername']
         Aadhar_number = request.data['Aadhar_number']
         vehicle_image = request.data['vehicle_image']
-        db = heavyvehivalregistration(vehical_name=vehical_name, vehical_number=vehical_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number, vehicle_image=vehicle_image, created_by = request.userId)
+        manufectoring_date = request.data['manufectoring_date']
+        db = heavyvehivalregistration(vehical_name=vehical_name, company_name=company_name, vehical_number=vehical_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number, vehicle_image=vehicle_image, manufectoring_date=manufectoring_date, created_by = request.userId)
         db.save()
-        return Response({"message":"heavy Vehicle register successfully"})
+        return Response({"message":"heavy vehicle register successfully"})
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
         return Response({'error': Messages.SOMETHING_WENT_WRONG}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+    def get(api_view):
+        candidates = heavyvehivalregistration.objects.all()
+        schema = heavyvehivalregistration(candidates)
+        return Response({'status':'success', 'candidates':candidates.schema}, status=status.HTTP_200_OK)
     ##### driveroperator registrations functions##################### 
 
 
@@ -786,7 +796,7 @@ def doregistration(request):
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "alternet_mobilenumber": {'type': 'integer', 'required': False, 'nullable': True},
             "license_number": {'type': 'integer', 'required': False, 'nullable': True},
-            "driver_image": {'type': 'string', 'required': True, 'nullable': False},
+            "driver_image": {'type': 'string', 'required': False, 'nullable': True},
 
         }
         v = Validator()
@@ -802,7 +812,7 @@ def doregistration(request):
         alternet_mobilenumber = request.data['alternet_mobilenumber']
         license_number = request.data['license_number']
         driver_image = request.data['driver_image']
-        db = driveroperatorregistration(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number, driver_image=driver_image, created_by =  request.userId)
+        db = driveroperatorregistration(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number,driver_image=driver_image, created_by =  request.userId)
         db.save()
         return Response({"message":"Driver operator register successfully"})
     except Exception as e:
@@ -816,6 +826,43 @@ def doregistration(request):
 @api_view(['POST'])
 @isAuthenticate 
 def subcregistration(request):
+    try:
+        schema = {
+            "contractorname": {'type': 'string', 'required': True, 'nullable': False},
+            "firmname": {'type': 'string', 'required': True, 'nullable': False},
+            "expriencesinyear": {'type': 'integer', 'required': True, 'nullable': False},
+            "license_number": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
+            "subcontractor_image": {'type': 'string', 'required': False, 'nullable': True},
+
+        }
+        v = Validator()
+        if not v.validate(request.data, schema):
+            return Response(requestErrorMessagesFormate(v.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        db = SqlQueryBuilder()
+        contractorname = request.data['contractorname']
+        firmname = request.data['firmname']
+        expriencesinyear = request.data['expriencesinyear']
+        license_number = request.data['license_number']
+        Aadhar_number = request.data['Aadhar_number']
+        subcontractor_image = request.data['subcontractor_image']
+        db = subcontractorregistration(contractorname=contractorname, firmname=firmname, expriencesinyear=expriencesinyear, license_number=license_number, Aadhar_number=Aadhar_number, subcontractor_image=subcontractor_image, created_by = request.userId)
+        db.save()
+        return Response({"message":"sub contractor  registration successfully"})
+    except Exception as e:
+        print('......................deduct credit on view post....................',str(e))
+        return Response({'error': Messages.SOMETHING_WENT_WRONG}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+################################# Request subcontractor Registration #########################       
+
+@api_view(['POST'])
+@isAuthenticate 
+def reqsubcon(request):
     try:
         schema = {
             "contractorname": {'type': 'string', 'required': True, 'nullable': False},
@@ -840,12 +887,15 @@ def subcregistration(request):
         license_number = request.data['license_number']
         Aadhar_number = request.data['Aadhar_number']
         subcontractor_image = request.data['subcontractor_image']
-        db = subcontractorregistration(contractorname=contractorname, firmname=firmname, expriencesinyear=expriencesinyear, license_number=license_number, Aadhar_number=Aadhar_number, subcontractor_image=subcontractor_image, created_by = request.userId)
+        db = Request_SubContractor(contractorname=contractorname, firmname=firmname, expriencesinyear=expriencesinyear, license_number=license_number, Aadhar_number=Aadhar_number, subcontractor_image=subcontractor_image, created_by = request.userId)
+        print(db)
         db.save()
-        return Response({"message":"sub contractor  registration successfully"})
+
+        return Response({"message":"Request sub contractor successfully"})
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
         return Response({'error': Messages.SOMETHING_WENT_WRONG}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
    ################ labour constractor registrations functions  #############
@@ -853,6 +903,95 @@ def subcregistration(request):
 @api_view(['POST'])
 @isAuthenticate 
 def lacoregistration(request):
+    try:
+        schema = {
+        "labourcontractorname": {'type': 'string', 'required': True, 'nullable': False},
+        "labourwork": {'type': 'string', 'required': True, 'nullable': False},
+        "lobourinnumber": {'type': 'string', 'required': True, 'nullable':False},
+        "contractorAadhar_number": {'type': 'string', 'required': True, 'nullable':False},
+        "mobile_number": {'type': 'string', 'required': True, 'nullable':False},
+        "labour_image": {'type': 'string', 'required': False, 'nullable': True},
+        }
+        v = Validator()
+        if not v.validate(request.data, schema):
+            return Response(requestErrorMessagesFormate(v.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        
+        v_labourcontractorname = request.data['labourcontractorname']
+        v_labourwork = request.data['labourwork']
+        v_lobourinnumber = request.data['lobourinnumber']
+        v_contractorAadhar_number = request.data['contractorAadhar_number']
+        v_mobile_number = request.data['mobile_number']
+        labour_image = request.data['labour_image']
+        try:
+            db = labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, created_by = request.userId)
+            db.save()
+        except Exception as e:
+            return Response({'error':e})
+        return Response({"message":"Lobour contractor registrations successfully"})
+    except Exception as e:
+        print('......................deduct credit on view post....................',str(e))
+        return Response({'error': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+################all request ##########
+
+class ProfileView(APIView):
+    def get(self, request, formate=None):
+        candidates = Requirement.objects.all()
+        serializer = ProfileSerializer(candidates, many=True)
+        return Response({'status':'success','candidates':serializer.data}, status=status.HTTP_200_OK)
+
+
+
+################Request heavyVehicle##########
+
+@api_view(['POST'])
+@isAuthenticate 
+def requesthvregistration(request):
+    try:
+        schema = {
+            "vehicle_name": {'type': 'string', 'required': True, 'nullable': False},
+            "company_name": {'type': 'string', 'required': True, 'nullable': False},
+            "vehicle_number": {'type': 'integer', 'required': True, 'nullable': False},
+            "model_number": {'type': 'integer', 'required': False, 'nullable': True},
+            "ownername": {'type': 'string', 'required': False, 'nullable': True},
+            "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
+            "vehicle_image": {'type': 'string', 'required': False, 'nullable': True},
+            "manufectoring_date": {'type': 'string', 'required': False, 'nullable': True},
+
+        }
+        v = Validator()
+        if not v.validate(request.data, schema):
+            return Response(requestErrorMessagesFormate(v.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        #print(request.data['Aadhar_number'])
+        # Create database connection
+        db = SqlQueryBuilder()
+        vehicle_name = request.data['vehicle_name']
+        company_name = request.data['company_name']
+        vehicle_number = request.data['vehicle_number']
+        model_number = request.data['model_number']
+        ownername = request.data['ownername']
+        Aadhar_number = request.data['Aadhar_number']
+        vehicle_image = request.data['vehicle_image']
+        manufectoring_date = request.data['manufectoring_date']
+        db = Request_Heavy_Vehical(vehicle_name=vehicle_name,company_name=company_name, vehicle_number=vehicle_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number,vehicle_image=vehicle_image,manufectoring_date=manufectoring_date,created_by = request.userId)
+        db.save()
+        return Response({"message":"Vehicle request successfully"})
+    except Exception as e:
+        print('......................deduct credit on view post....................',str(e))
+        return Response({'error': Messages.SOMETHING_WENT_WRONG}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+@api_view(['POST'])
+@isAuthenticate 
+def requestlacontractor(request):
     try:
         schema = {
         "labourcontractorname": {'type': 'string', 'required': True, 'nullable': False},
@@ -877,30 +1016,28 @@ def lacoregistration(request):
         v_mobile_number = request.data['mobile_number']
         labour_image = request.data['labour_image']
         try:
-            db = labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image,created_by = request.userId)
+            db = Request_labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image,created_by = request.userId)
             db.save()
         except Exception as e:
             return Response({'error':e})
-        return Response({"message":"Lobour contractor registrations successfully"})
+        return Response({"message":"Request Lobour contractor successfully"})
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
         return Response({'error': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-################Request heavyVehicle##########
-
 @api_view(['POST'])
 @isAuthenticate 
-def reqeusthvregistration(request):
+def requestdoperator(request):
     try:
         schema = {
-            "vehical_name": {'type': 'string', 'required': True, 'nullable': False},
-            "vehical_number": {'type': 'integer', 'required': True, 'nullable': False},
-            "model_number": {'type': 'integer', 'required': False, 'nullable': True},
-            "ownername": {'type': 'string', 'required': False, 'nullable': True},
+            "vehicalname": {'type': 'string', 'required': True, 'nullable': False},
+            "expriencesinyear": {'type': 'integer', 'required': True, 'nullable': False},
+            "driveroperatorname": {'type': 'string', 'required': True, 'nullable': False},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
-            "image": {'type': 'string', 'required': False, 'nullable': True},
+            "alternet_mobilenumber": {'type': 'integer', 'required': False, 'nullable': True},
+            "license_number": {'type': 'integer', 'required': False, 'nullable': True},
+            "driver_image": {'type': 'string', 'required': True, 'nullable': False},
 
         }
         v = Validator()
@@ -909,52 +1046,16 @@ def reqeusthvregistration(request):
     except Exception as e:
         return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        #print(request.data['Aadhar_number'])
-        # Create database connection
-        db = SqlQueryBuilder()
-        vehical_name = request.data['vehical_name']
-        vehical_number = request.data['vehical_number']
-        model_number = request.data['model_number']
-        ownername = request.data['ownername']
+        vehicalname = request.data['vehicalname']
+        expriencesinyear = request.data['expriencesinyear']
+        driveroperatorname = request.data['driveroperatorname']
         Aadhar_number = request.data['Aadhar_number']
-        image = request.data['image']
-
-        db = Request_Heavy_Vehical(vehical_name=vehical_name, vehical_number=vehical_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number,image=image,created_by = request.userId)
+        alternet_mobilenumber = request.data['alternet_mobilenumber']
+        license_number = request.data['license_number']
+        driver_image = request.data['driver_image']
+        db = Request_driver_Operator(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number, driver_image=driver_image, created_by =  request.userId)
         db.save()
-        return Response({"message":"user request successfully"})
+        return Response({"message":"Request Driver operator successfully"})
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
-        return Response({'error': Messages.SOMETHING_WENT_WRONG}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-################heavyVehicalregistrations ##########
-
-@api_view(['POST'])
-@isAuthenticate 
-def allrequirement(request):
-    try:
-        schema = {
-            "title": {'type': 'string', 'required': True, 'nullable': False},
-            "description": {'type': 'string', 'required': True, 'nullable': False},
-        }
-        v = Validator()
-        if not v.validate(request.data, schema):
-            return Response(requestErrorMessagesFormate(v.errors), status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    try:
-        #print(request.data['Aadhar_number'])
-        # Create database connection
-        db = SqlQueryBuilder()
-        title = request.data['title']
-        print(title)
-        description = request.data['description']
-        #print(description)
-        db = Requirement(title=title, description=description,  created_by = request.userId)
-        db.save()
-        return Response({"message":"Requirements Uploaded  Successfully"})
-    except Exception as e:
-        print('......................deduct credit on view post....................',str(e))
-        return Response({'error': Messages.SOMETHING_WENT_WRONG}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-
+        return Response({'error':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -51,21 +51,7 @@ class Device(models.Model):
 
 #  labour contracot registrations
 
-class labour_contructor(models.Model):
-    Id = models.AutoField(primary_key=True)
-    labourcontractorname = models.CharField(max_length=300)
-    labourwork = models.CharField(max_length=200)
-    lobourinnumber = models.CharField(max_length=12)
-    mobile_number = models.CharField(max_length=20)
-    contractorAadhar_number = models.CharField(max_length=20)
-    labour_image = models.CharField(max_length=500,blank=True, null=True)
 
-    created_by =  models.IntegerField()
-    is_active = models.BooleanField(default=1,null=False)
-
-
-    class Meta:
-        db_table = 'labour_contructor'
 
 
 class user_address(models.Model):
@@ -99,13 +85,17 @@ class upload_lobour_document(models.Model):
 
 
 class heavyvehivalregistration(models.Model):
+    def nameFile(instance, filename):
+     return '/'.join(['images', str(instance.vehical_name), filename])
     Id = models.AutoField(primary_key=True, )
     vehical_name = models.CharField(max_length=200)
+    company_name = models.CharField(max_length = 100)
     vehical_number = models.CharField(max_length=500)
     model_number = models.CharField(max_length=500)
     ownername = models.CharField(max_length=300)
     Aadhar_number = models.CharField(max_length=20)
     vehicle_image = models.CharField(max_length=500)
+    manufectoring_date = models.CharField(max_length=100)
 
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
@@ -151,7 +141,7 @@ class driveroperatorregistration(models.Model):
     Aadhar_number = models.CharField(max_length=20)
     alternet_mobilenumber = models.IntegerField()
     license_number = models.CharField(max_length=50)
-    driver_image = models.FileField(max_length=500, blank=True, null=True)
+    driver_image = models.CharField(max_length=500, blank=True, null=True)
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 
@@ -174,17 +164,51 @@ class subcontractorregistration(models.Model):
     class Meta:
         db_table = "subcontractorregistration"
 
+class labour_contructor(models.Model):
+    Id = models.AutoField(primary_key=True)
+    labourcontractorname = models.CharField(max_length=300)
+    labourwork = models.CharField(max_length=200)
+    lobourinnumber = models.CharField(max_length=12)
+    mobile_number = models.CharField(max_length=20)
+    contractorAadhar_number = models.CharField(max_length=20)
+    labour_image = models.CharField(max_length=500,blank=True, null=True)
+
+    created_by =  models.IntegerField()
+    is_active = models.BooleanField(default=1,null=False)
+
+
+    class Meta:
+        db_table = 'labour_contructor'
+
+class Request_SubContractor(models.Model):
+    Id = models.AutoField(primary_key=True, )
+    contractorname = models.CharField(max_length=100)
+    firmname = models.CharField(max_length=500)
+    expriencesinyear = models.IntegerField(blank=False, null=False)
+    license_number = models.CharField(max_length=50)
+    Aadhar_number = models.CharField(max_length=20)
+    subcontractor_image = models.CharField(max_length=500, blank=True, null=True)
+    created_by =  models.IntegerField()
+    is_active = models.BooleanField(default=1,null=False)
+
+    class Meta:
+        db_table = "request_subcontractor"
+
 
 ################# Request Api ###############
 
 class Request_Heavy_Vehical(models.Model):
     Id = models.AutoField(primary_key=True, )
-    vehical_name = models.CharField(max_length=200)
-    vehical_number = models.CharField(max_length=500)
+    vehicle_name = models.CharField(max_length=200)
+    company_name = models.CharField(max_length = 100)
+
+    vehicle_number = models.CharField(max_length=500)
     model_number = models.CharField(max_length=500)
     ownername = models.CharField(max_length=300)
     Aadhar_number = models.CharField(max_length=20)
-    image =  models.CharField(max_length=255, blank=True, null=True)
+    vehicle_image =  models.CharField(max_length=255, blank=True, null=True)
+    manufectoring_date = models.CharField(max_length=100)
+
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 
@@ -192,10 +216,43 @@ class Request_Heavy_Vehical(models.Model):
         db_table = "Request_Heavy_Vehical"
 
 
+class Request_driver_Operator(models.Model):
+    Id = models.AutoField(primary_key=True, )
+    vehicalname = models.CharField(max_length=200)
+    expriencesinyear = models.IntegerField(blank=False, null=False)
+    driveroperatorname = models.CharField(max_length=200)
+    Aadhar_number = models.CharField(max_length=20)
+    alternet_mobilenumber = models.IntegerField()
+    license_number = models.CharField(max_length=50)
+    driver_image = models.FileField(max_length=500, blank=True, null=True)
+    created_by =  models.IntegerField()
+    is_active = models.BooleanField(default=1,null=False)
+
+    class Meta:
+        db_table = "Request_driver_Operator"
+
+class Request_labour_contructor(models.Model):
+    Id = models.AutoField(primary_key=True)
+    labourcontractorname = models.CharField(max_length=300)
+    labourwork = models.CharField(max_length=200)
+    lobourinnumber = models.CharField(max_length=12)
+    mobile_number = models.CharField(max_length=20)
+    contractorAadhar_number = models.CharField(max_length=20)
+    labour_image = models.CharField(max_length=500,blank=True, null=True)
+
+    created_by =  models.IntegerField()
+    is_active = models.BooleanField(default=1,null=False)
+
+
+    class Meta:
+        db_table = 'request_labour_contructor'
+
+
 class Requirement(models.Model):
     Id = models.AutoField(primary_key=True, )
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
+    requirement_image = models.CharField(max_length=500)
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 

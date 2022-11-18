@@ -1,0 +1,115 @@
+label:not(.form-check-label):not(.custom-file-label) {
+    font-weight: 500;
+    font-size: .9rem!important;
+}
+
+.custom-font-size{
+    font-size: .9rem!important;
+}
+
+.notification-font{
+    font-size: .9rem!important;
+    color: #F6BC88;
+}
+
+.card-bg{
+    background-color: #20272D!important;
+}
+
+.card-outline-yellow{
+    border-top: 3px solid #FAB720!important;
+}
+
+.card-header-bottom{
+    border-bottom: 1px solid rgba(255, 255, 255, 0.125)!important;
+}
+
+.custom-form-control{
+    background-color: #353F4B!important;
+    color: #fff!important;
+    height: 50px;
+    box-shadow: 4px 4px 4px 25% #000;
+    border: 1px #20272D!important;
+}
+
+.custom-input-group-text{
+    background-color: #353F4B!important;
+    border: 0px solid #20272D!important;
+    color: #919DA2!important;
+}
+
+.caret-style{
+    caret-color: #FAB720!important;
+}
+
+.text-yellow{
+    color: #FAB720!important;;
+}
+
+.icheck-primary > input:first-child:checked + label::before, .icheck-primary > input:first-child:checked + input[type="hidden"] + label::before {
+    background-color: #FAB720!important;
+    border-color: #FAB720!important;
+}
+
+[class*=icheck-]>input:first-child+input[type=hidden]+label::before, [class*=icheck-]>input:first-child+label::before{
+    content: "";
+    display: inline-block;
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #D3CFC8;
+    border-radius: 3px;
+    margin-left: -29px;
+}
+
+[class*=icheck-]>input:first-child:checked+input[type=hidden]+label::after, [class*=icheck-]>input:first-child:checked+label::after{
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 7px;
+    height: 10px;
+    border: 2px solid #20272D;
+    border-left: none;
+    border-top: none;
+    transform: translate(7.75px,4.5px) rotate(45deg);
+}
+
+.btn-yellow {
+    color: #20272D;
+    background-color: #FAB720;
+    border-color: #FAB720;
+    border-radius: 50px;
+    height: 46px;
+    box-shadow: none;
+    font-weight: 600;
+}
+
+.btn-white {
+    color: #20272D;
+    background-color: #DEF7FE;
+    border-color: #DEF7FE;
+    border-radius: 50px;
+    height: 46px;
+    box-shadow: none;
+    font-weight: 600;
+}
+
+.btn-red {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+    border-radius: 50px;
+    height: 46px;
+    box-shadow: none;
+    font-weight: 600;
+}
+
+.btn-red:hover {
+    color: #fff;
+}
+
+.fa-style{
+    margin-left: 5px!important;
+}

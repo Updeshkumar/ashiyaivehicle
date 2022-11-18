@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework import routers
 from . import views
 
+
 router = routers.DefaultRouter()
 
 urlpatterns = [
@@ -14,13 +15,16 @@ urlpatterns = [
     path('user', views.update_user_profile),
     path('master_data', views.get_master_data),
     path('hvbesicdetails', views.hvregistration), 
-    path('reqheavyvehicle', views.reqeusthvregistration),
+    path('reqheavyvehicle', views.requesthvregistration),
     path('doregistrations', views.doregistration),
+    path('reqdriveroperator', views.requestdoperator),
     path('subcregistration', views.subcregistration),
+    path('reqsubcontractor', views.reqsubcon),
     path('lacoregistration', views.lacoregistration),
+    path('reqlacontractor', views.requestlacontractor),
     path('logout', views.logout),
     path('filter_data', views.filter_data),
-    path('allrequirement', views.allrequirement),
+    path('listrequirement/', views.ProfileView.as_view(), name="list" ),
 
 ]
 

@@ -1,13 +1,19 @@
 from django.contrib import admin
-from user.models import MasterContents, Device, labour_contructor, heavyvehivalregistration,Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, Requirement
+from user.models import MasterContents, Device,Request_labour_contructor, Request_SubContractor, labour_contructor, heavyvehivalregistration,Request_driver_Operator,Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, Requirement
+
+
+admin.site.register(Request_driver_Operator)
+admin.site.register(Request_labour_contructor)
+admin.site.register(Request_SubContractor)
+
 
 class requestrequirementAdmin(admin.ModelAdmin):
-    list_display = ['Id', 'title', 'description',]
+    list_display = ['Id', 'title', 'description', 'requirement_image']
 admin.site.register(Requirement,requestrequirementAdmin)
 
 
 class reqeustheavyvehicalAdmin(admin.ModelAdmin):
-    list_display = ['Id', 'vehical_name', 'vehical_number', 'model_number', 'ownername', 'Aadhar_number','image',]
+    list_display = ['Id', 'vehicle_name','company_name', 'vehicle_number', 'model_number', 'ownername', 'Aadhar_number','vehicle_image','manufectoring_date',]
 
 admin.site.register(Request_Heavy_Vehical,reqeustheavyvehicalAdmin)
 
