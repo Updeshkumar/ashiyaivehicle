@@ -26,7 +26,7 @@ from django.http import HttpResponse
 from dotenv import dotenv_values
 config = dotenv_values(".env")
 import requests
-from user.models import User, Device, MasterContents, Device, heavyvehivalregistration,Request_SubContractor, Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, labour_contructor, Requirement, Request_labour_contructor, Request_driver_Operator
+from user.models import User, Device, MasterContents, Device, heavyvehivalregistration,Request_SubContractor, Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, labour_contructor, Requirement, Request_labour_contructor, Request_driver_Operator, VedioUplaod
 import razorpay
 import random
 from api.settings import image_uploadPath
@@ -39,7 +39,7 @@ razorpay_client = razorpay.Client(auth=("rzp_live_H6G6PNWGPU3vwq", "djfo8LPqdP6V
 ################# import filter functions ##################
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
-from user.serializers import ProfileSerializer
+from user.serializers import ProfileSerializer,VedioSerailzer
 from rest_framework.views import APIView 
 
 
@@ -154,6 +154,7 @@ def excelUpload(request):
             else:
                 message = "User Already Exists!"
     return render(request,template)
+
     
 @api_view(['GET'])
 def get_master_data(request):  # get studies
@@ -944,6 +945,15 @@ class ProfileView(APIView):
         candidates = Requirement.objects.all()
         serializer = ProfileSerializer(candidates, many=True)
         return Response({'status':'success','candidates':serializer.data}, status=status.HTTP_200_OK)
+
+###############upload images vedio ############
+
+class ImageView(APIView):
+    def get(self, request, formate=None):
+        hello = VedioUplaod.objects.all()
+        serializer = VedioSerailzer(hello, many=True)
+        return Response({'status':'success','hello':serializer.data}, status=status.HTTP_200_OK)
+        
 
 
 

@@ -262,4 +262,13 @@ class Requirement(models.Model):
         db_table = "requirement"
 
 
+class VedioUplaod(models.Model):
+    Id = models.AutoField(primary_key=True)
+    image_uplaod = models.CharField(max_length=500)
+    vediourl = models.CharField(max_length=100)
+    class Meta:
+        db_table = "vedioupload"
+
+
+
 

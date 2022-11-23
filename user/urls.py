@@ -25,6 +25,7 @@ urlpatterns = [
     path('logout', views.logout),
     path('filter_data', views.filter_data),
     path('listrequirement/', views.ProfileView.as_view(), name="list" ),
+    path('images/', views.ImageView.as_view(), name="images"),
 
 ]
 
