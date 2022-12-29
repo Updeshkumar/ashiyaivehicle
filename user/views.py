@@ -748,11 +748,10 @@ def hvregistration(request):
             "vehical_name": {'type': 'string', 'required': True, 'nullable': False},
             "company_name": {'type': 'string', 'required': True, 'nullable': False},
             "vehical_number": {'type': 'string', 'required': True, 'nullable': False},
-            "model_number": {'type': 'string', 'required': False, 'nullable': True},
             "ownername": {'type': 'string', 'required': False, 'nullable': True},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "vehicle_image": {'type': 'string', 'required': False, 'nullable': True},
-            "manufectoring_date": {'type': 'string', 'required': True, 'nullable': False},
+            "model_number": {'type': 'string', 'required': True, 'nullable': False},
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -766,13 +765,11 @@ def hvregistration(request):
         vehical_name = request.data['vehical_name']
         company_name = request.data['company_name']
         vehical_number = request.data['vehical_number']
-        model_number = request.data['model_number']
         ownername = request.data['ownername']
         Aadhar_number = request.data['Aadhar_number']
         vehicle_image = request.data['vehicle_image']
-        manufectoring_date = request.data['manufectoring_date']
-        userId = request.userId
-        db = heavyvehivalregistration(vehical_name=vehical_name, company_name=company_name, vehical_number=vehical_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number, vehicle_image=vehicle_image, manufectoring_date=manufectoring_date, created_by = request.userId)
+        model_number = request.data['model_number']
+        db = heavyvehivalregistration(vehical_name=vehical_name, company_name=company_name,model_number=model_number, vehical_number=vehical_number,ownername=ownername, Aadhar_number=Aadhar_number, vehicle_image=vehicle_image, created_by = request.userId)
         db.save()
         return Response({"message":"heavy vehicle register successfully"})
     except Exception as e:
@@ -837,10 +834,7 @@ def subcregistration(request):
             "license_number": {'type': 'string', 'required': True, 'nullable': False},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "subcontractor_image": {'type': 'string', 'required': False, 'nullable': True},
-            "district": {'type': 'string', 'required': True, 'nullable': False},
-            "state": {'type': 'string', 'required': True, 'nullable': False},
-            "tehsil": {'type': 'string', 'required': True, 'nullable': False},
-
+           
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -856,10 +850,8 @@ def subcregistration(request):
         license_number = request.data['license_number']
         Aadhar_number = request.data['Aadhar_number']
         subcontractor_image = request.data['subcontractor_image']
-        district = request.data['district']
-        state = request.data['state']
-        tehsil = request.data['tehsil']
-        db = subcontractorregistration(contractorname=contractorname, firmname=firmname, expriencesinyear=expriencesinyear, license_number=license_number, Aadhar_number=Aadhar_number, subcontractor_image=subcontractor_image, district=district, state=state, tehsil=tehsil, created_by = request.userId)
+        
+        db = subcontractorregistration(contractorname=contractorname, firmname=firmname, expriencesinyear=expriencesinyear, license_number=license_number, Aadhar_number=Aadhar_number, subcontractor_image=subcontractor_image, created_by = request.userId)
         db.save()
         return Response({"message":"sub contractor  registration successfully"})
     except Exception as e:
@@ -920,9 +912,6 @@ def lacoregistration(request):
         "contractorAadhar_number": {'type': 'integer', 'required': True, 'nullable':False},
         "mobile_number": {'type': 'integer', 'required': True, 'nullable':False},
         "labour_image": {'type': 'string', 'required': False, 'nullable': True},
-        "district": {'type': 'string', 'required': True, 'nullable': False},
-        "state": {'type': 'string', 'required': True, 'nullable': False},
-        "tehsil": {'type': 'string', 'required': True, 'nullable': False},
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -938,11 +927,9 @@ def lacoregistration(request):
         v_contractorAadhar_number = request.data['contractorAadhar_number']
         v_mobile_number = request.data['mobile_number']
         labour_image = request.data['labour_image']
-        district = request.data['district']
-        state = request.data['state']
-        tehsil = request.data['tehsil']
+        
         try:
-            db = labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, district=district, state=state, tehsil=tehsil, created_by = request.userId)
+            db = labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, created_by = request.userId)
             db.save()
         except Exception as e:
             return Response({'error':e})
@@ -977,9 +964,7 @@ def requesthvregistration(request):
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "vehicle_image": {'type': 'string', 'required': False, 'nullable': True},
             "manufectoring_date": {'type': 'string', 'required': False, 'nullable': True},
-            "district": {'type': 'string', 'required': True, 'nullable': False},
-            "state": {'type': 'string', 'required': True, 'nullable': False},
-            "tehsil": {'type': 'string', 'required': True, 'nullable': False},
+            
 
         }
         v = Validator()
@@ -999,10 +984,7 @@ def requesthvregistration(request):
         Aadhar_number = request.data['Aadhar_number']
         vehicle_image = request.data['vehicle_image']
         manufectoring_date = request.data['manufectoring_date']
-        district = request.data['district']
-        state = request.data['state']
-        tehsil = request.data['tehsil']
-        db = Request_Heavy_Vehical(vehicle_name=vehicle_name,company_name=company_name, vehicle_number=vehicle_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number,vehicle_image=vehicle_image,manufectoring_date=manufectoring_date, district=district, state=state, tehsil=tehsil, created_by = request.userId)
+        db = Request_Heavy_Vehical(vehicle_name=vehicle_name,company_name=company_name, vehicle_number=vehicle_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number,vehicle_image=vehicle_image,manufectoring_date=manufectoring_date, created_by = request.userId)
         db.save()
         return Response({"message":"Vehicle request successfully"})
     except Exception as e:
@@ -1021,9 +1003,7 @@ def requestlacontractor(request):
         "contractorAadhar_number": {'type': 'integer', 'required': True, 'nullable':False},
         "mobile_number": {'type': 'integer', 'required': True, 'nullable':False},
         "labour_image": {'type': 'string', 'required': True, 'nullable':False},
-        "district": {'type': 'string', 'required': True, 'nullable': False},
-        "state": {'type': 'string', 'required': True, 'nullable': False},
-        "tehsil": {'type': 'string', 'required': True, 'nullable': False},
+        
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -1039,11 +1019,9 @@ def requestlacontractor(request):
         v_contractorAadhar_number = request.data['contractorAadhar_number']
         v_mobile_number = request.data['mobile_number']
         labour_image = request.data['labour_image']
-        district = request.data['district']
-        state = request.data['state']
-        tehsil = request.data['tehsil']
+        
         try:
-            db = Request_labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, district=district, state=state, tehsil=tehsil, created_by = request.userId)
+            db = Request_labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, created_by = request.userId)
             db.save()
         except Exception as e:
             return Response({'error':e})
@@ -1065,10 +1043,7 @@ def requestdoperator(request):
             "alternet_mobilenumber": {'type': 'integer', 'required': False, 'nullable': True},
             "license_number": {'type': 'string', 'required': False, 'nullable': True},
             "driver_image": {'type': 'string', 'required': True, 'nullable': False},
-            "district": {'type': 'string', 'required': True, 'nullable': False},
-            "state": {'type': 'string', 'required': True, 'nullable': False},
-            "tehsil": {'type': 'string', 'required': True, 'nullable': False},
-
+            
 
         }
         v = Validator()
@@ -1084,10 +1059,8 @@ def requestdoperator(request):
         alternet_mobilenumber = request.data['alternet_mobilenumber']
         license_number = request.data['license_number']
         driver_image = request.data['driver_image']
-        district = request.data['district']
-        state = request.data['state']
-        tehsil = request.data['tehsil']
-        db = Request_driver_Operator(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number, driver_image=driver_image, district=district, state=state, tehsil=tehsil, created_by =  request.userId)
+        
+        db = Request_driver_Operator(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number, driver_image=driver_image, created_by =  request.userId)
         db.save()
         return Response({"message":"Request Driver operator successfully"})
     except Exception as e:

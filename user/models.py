@@ -58,9 +58,6 @@ class labour_contructor(models.Model):
     mobile_number = models.CharField(max_length=20)
     contractorAadhar_number = models.CharField(max_length=20)
     labour_image = models.CharField(max_length=500)
-    district = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    tehsil = models.CharField(max_length=100)
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 
@@ -113,17 +110,10 @@ class heavyvehivalregistration(models.Model):
     vehical_name = models.CharField(max_length=200)
     company_name = models.CharField(max_length = 100)
     vehical_number = models.CharField(max_length=500)
-    model_number = models.CharField(max_length=500)
     ownername = models.CharField(max_length=300)
     Aadhar_number = models.CharField(max_length=20)
     vehicle_image = models.CharField(max_length=500)
-    manufectoring_date = models.CharField(max_length=100)
-
-    # district = models.CharField(max_length=100)
-    # state = models.CharField(max_length=100)
-    # tehsil = models.CharField(max_length=100)
-    
-
+    model_number = models.CharField(max_length=100)
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 
@@ -169,9 +159,6 @@ class driveroperatorregistration(models.Model):
     alternet_mobilenumber = models.IntegerField()
     license_number = models.CharField(max_length=50)
     driver_image = models.CharField(max_length=500)
-    # district = models.CharField(max_length=100)
-    # state = models.CharField(max_length=100)
-    # tehsil = models.CharField(max_length=100)
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 
@@ -188,9 +175,6 @@ class subcontractorregistration(models.Model):
     license_number = models.CharField(max_length=50)
     Aadhar_number = models.CharField(max_length=20)
     subcontractor_image = models.CharField(max_length=500)
-    district = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    tehsil = models.CharField(max_length=100)
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 
@@ -247,10 +231,6 @@ class Request_Heavy_Vehical(models.Model):
     Aadhar_number = models.CharField(max_length=20)
     vehicle_image =  models.CharField(max_length=255, blank=True, null=True)
     manufectoring_date = models.CharField(max_length=100)
-    district = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    tehsil = models.CharField(max_length=100)
-
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 
@@ -265,11 +245,6 @@ class Request_labour_contructor(models.Model):
     mobile_number = models.CharField(max_length=20)
     contractorAadhar_number = models.CharField(max_length=20)
     labour_image = models.CharField(max_length=500,blank=True, null=True)
-    district = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    tehsil = models.CharField(max_length=100)
-
-
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 
@@ -286,9 +261,6 @@ class Request_driver_Operator(models.Model):
     alternet_mobilenumber = models.IntegerField()
     license_number = models.CharField(max_length=50)
     driver_image = models.FileField(max_length=500, blank=True, null=True)
-    district = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    tehsil = models.CharField(max_length=100)
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 
