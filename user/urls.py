@@ -14,7 +14,9 @@ urlpatterns = [
     path('user/<int:userId>', views.get_user_profile),
     path('user', views.update_user_profile),
     path('master_data', views.get_master_data),
+    path('postmasterdata', views.save_master_data),
     path('hvbesicdetails', views.hvregistration), 
+    path('hvaddress', views.hvaddress, name="hvaddress"),
     path('reqheavyvehicle', views.requesthvregistration),
     path('doregistrations', views.doregistration),
     path('reqdriveroperator', views.requestdoperator),
@@ -26,6 +28,8 @@ urlpatterns = [
     path('filter_data', views.filter_data),
     path('listrequirement/', views.ProfileView.as_view(), name="list" ),
     path('images/', views.ImageView.as_view(), name="images"),
+    path('normaluser', views.normaluserregistration, name="normaluser"),
+    path("sp", views.saverecordemp),
 
 ]
 

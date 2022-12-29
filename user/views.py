@@ -26,7 +26,7 @@ from django.http import HttpResponse
 from dotenv import dotenv_values
 config = dotenv_values(".env")
 import requests
-from user.models import User, Device, MasterContents, Device, heavyvehivalregistration,Request_SubContractor, Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, labour_contructor, Requirement, Request_labour_contructor, Request_driver_Operator, VedioUplaod
+from user.models import User, Device, MasterContents,heavyvehicleaddress, Device,NormalUser, heavyvehivalregistration,Request_SubContractor, Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, labour_contructor, Requirement, Request_labour_contructor, Request_driver_Operator, VedioUplaod
 import razorpay
 import random
 from api.settings import image_uploadPath
@@ -39,7 +39,7 @@ razorpay_client = razorpay.Client(auth=("rzp_live_H6G6PNWGPU3vwq", "djfo8LPqdP6V
 ################# import filter functions ##################
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
-from user.serializers import ProfileSerializer,VedioSerailzer
+from user.serializers import ProfileSerializer, VedioSerailzer
 from rest_framework.views import APIView 
 
 
@@ -154,7 +154,6 @@ def excelUpload(request):
             else:
                 message = "User Already Exists!"
     return render(request,template)
-
     
 @api_view(['GET'])
 def get_master_data(request):  # get studies
@@ -222,9 +221,11 @@ def filter_data(request):  # get studies
              
             _result = db.readProcedureJson('getDrivers',[pageLimit, pageOffset])
         if request.GET['type'] == 'vehicle':
-            _result = db.readProcedureJson('getHeavyVehicles',[])
+            _result = db.readProcedureJson('heavyvehicle',[])
         if request.GET['type'] == 'labour':
             _result = db.readProcedureJson('getLabours',[])
+        if request.GET['type'] == 'subcontructor':
+            _result = db.readProcedureJson('subcontractor',[])
         db.commit()
 
         if len(_result)>0:
@@ -737,23 +738,21 @@ def uploadFile(request):
         return Response({"message":"success", "status":"success", "image_url":imagPath})
     except Exception as e:
         return Response({"message":"failed", "status":"failed", "err":e})
-
 ################heavyVehicalregistrations ##########
 
-@api_view(['POST', 'GET'])
+@api_view(['POST'])
 @isAuthenticate 
 def hvregistration(request):
     try:
         schema = {
             "vehical_name": {'type': 'string', 'required': True, 'nullable': False},
             "company_name": {'type': 'string', 'required': True, 'nullable': False},
-            "vehical_number": {'type': 'integer', 'required': True, 'nullable': False},
-            "model_number": {'type': 'integer', 'required': False, 'nullable': True},
+            "vehical_number": {'type': 'string', 'required': True, 'nullable': False},
+            "model_number": {'type': 'string', 'required': False, 'nullable': True},
             "ownername": {'type': 'string', 'required': False, 'nullable': True},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "vehicle_image": {'type': 'string', 'required': False, 'nullable': True},
             "manufectoring_date": {'type': 'string', 'required': True, 'nullable': False},
-
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -772,16 +771,13 @@ def hvregistration(request):
         Aadhar_number = request.data['Aadhar_number']
         vehicle_image = request.data['vehicle_image']
         manufectoring_date = request.data['manufectoring_date']
+        userId = request.userId
         db = heavyvehivalregistration(vehical_name=vehical_name, company_name=company_name, vehical_number=vehical_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number, vehicle_image=vehicle_image, manufectoring_date=manufectoring_date, created_by = request.userId)
         db.save()
         return Response({"message":"heavy vehicle register successfully"})
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
         return Response({'error': Messages.SOMETHING_WENT_WRONG}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    def get(api_view):
-        candidates = heavyvehivalregistration.objects.all()
-        schema = heavyvehivalregistration(candidates)
-        return Response({'status':'success', 'candidates':candidates.schema}, status=status.HTTP_200_OK)
     ##### driveroperator registrations functions##################### 
 
 
@@ -796,8 +792,11 @@ def doregistration(request):
             "driveroperatorname": {'type': 'string', 'required': True, 'nullable': False},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "alternet_mobilenumber": {'type': 'integer', 'required': False, 'nullable': True},
-            "license_number": {'type': 'integer', 'required': False, 'nullable': True},
+            "license_number": {'type': 'string', 'required': False, 'nullable': True},
             "driver_image": {'type': 'string', 'required': False, 'nullable': True},
+            # "district": {'type': 'string', 'required': True, 'nullable': False},
+            # "state": {'type': 'string', 'required': True, 'nullable': False},
+            # "tehsil": {'type': 'string', 'required': True, 'nullable': False},
 
         }
         v = Validator()
@@ -813,6 +812,9 @@ def doregistration(request):
         alternet_mobilenumber = request.data['alternet_mobilenumber']
         license_number = request.data['license_number']
         driver_image = request.data['driver_image']
+        # district = request.data['district']
+        # state = request.data['state']
+        # tehsil = request.data['tehsil']
         db = driveroperatorregistration(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number,driver_image=driver_image, created_by =  request.userId)
         db.save()
         return Response({"message":"Driver operator register successfully"})
@@ -835,6 +837,9 @@ def subcregistration(request):
             "license_number": {'type': 'string', 'required': True, 'nullable': False},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "subcontractor_image": {'type': 'string', 'required': False, 'nullable': True},
+            "district": {'type': 'string', 'required': True, 'nullable': False},
+            "state": {'type': 'string', 'required': True, 'nullable': False},
+            "tehsil": {'type': 'string', 'required': True, 'nullable': False},
 
         }
         v = Validator()
@@ -851,7 +856,10 @@ def subcregistration(request):
         license_number = request.data['license_number']
         Aadhar_number = request.data['Aadhar_number']
         subcontractor_image = request.data['subcontractor_image']
-        db = subcontractorregistration(contractorname=contractorname, firmname=firmname, expriencesinyear=expriencesinyear, license_number=license_number, Aadhar_number=Aadhar_number, subcontractor_image=subcontractor_image, created_by = request.userId)
+        district = request.data['district']
+        state = request.data['state']
+        tehsil = request.data['tehsil']
+        db = subcontractorregistration(contractorname=contractorname, firmname=firmname, expriencesinyear=expriencesinyear, license_number=license_number, Aadhar_number=Aadhar_number, subcontractor_image=subcontractor_image, district=district, state=state, tehsil=tehsil, created_by = request.userId)
         db.save()
         return Response({"message":"sub contractor  registration successfully"})
     except Exception as e:
@@ -908,10 +916,13 @@ def lacoregistration(request):
         schema = {
         "labourcontractorname": {'type': 'string', 'required': True, 'nullable': False},
         "labourwork": {'type': 'string', 'required': True, 'nullable': False},
-        "lobourinnumber": {'type': 'string', 'required': True, 'nullable':False},
-        "contractorAadhar_number": {'type': 'string', 'required': True, 'nullable':False},
-        "mobile_number": {'type': 'string', 'required': True, 'nullable':False},
+        "lobourinnumber": {'type': 'integer', 'required': True, 'nullable':False},
+        "contractorAadhar_number": {'type': 'integer', 'required': True, 'nullable':False},
+        "mobile_number": {'type': 'integer', 'required': True, 'nullable':False},
         "labour_image": {'type': 'string', 'required': False, 'nullable': True},
+        "district": {'type': 'string', 'required': True, 'nullable': False},
+        "state": {'type': 'string', 'required': True, 'nullable': False},
+        "tehsil": {'type': 'string', 'required': True, 'nullable': False},
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -927,8 +938,11 @@ def lacoregistration(request):
         v_contractorAadhar_number = request.data['contractorAadhar_number']
         v_mobile_number = request.data['mobile_number']
         labour_image = request.data['labour_image']
+        district = request.data['district']
+        state = request.data['state']
+        tehsil = request.data['tehsil']
         try:
-            db = labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, created_by = request.userId)
+            db = labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, district=district, state=state, tehsil=tehsil, created_by = request.userId)
             db.save()
         except Exception as e:
             return Response({'error':e})
@@ -946,15 +960,6 @@ class ProfileView(APIView):
         serializer = ProfileSerializer(candidates, many=True)
         return Response({'status':'success','candidates':serializer.data}, status=status.HTTP_200_OK)
 
-###############upload images vedio ############
-
-class ImageView(APIView):
-    def get(self, request, formate=None):
-        hello = VedioUplaod.objects.all()
-        serializer = VedioSerailzer(hello, many=True)
-        return Response({'status':'success','hello':serializer.data}, status=status.HTTP_200_OK)
-        
-
 
 
 ################Request heavyVehicle##########
@@ -966,12 +971,15 @@ def requesthvregistration(request):
         schema = {
             "vehicle_name": {'type': 'string', 'required': True, 'nullable': False},
             "company_name": {'type': 'string', 'required': True, 'nullable': False},
-            "vehicle_number": {'type': 'integer', 'required': True, 'nullable': False},
-            "model_number": {'type': 'integer', 'required': False, 'nullable': True},
+            "vehicle_number": {'type': 'string', 'required': True, 'nullable': False},
+            "model_number": {'type': 'string', 'required': False, 'nullable': True},
             "ownername": {'type': 'string', 'required': False, 'nullable': True},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "vehicle_image": {'type': 'string', 'required': False, 'nullable': True},
             "manufectoring_date": {'type': 'string', 'required': False, 'nullable': True},
+            "district": {'type': 'string', 'required': True, 'nullable': False},
+            "state": {'type': 'string', 'required': True, 'nullable': False},
+            "tehsil": {'type': 'string', 'required': True, 'nullable': False},
 
         }
         v = Validator()
@@ -991,7 +999,10 @@ def requesthvregistration(request):
         Aadhar_number = request.data['Aadhar_number']
         vehicle_image = request.data['vehicle_image']
         manufectoring_date = request.data['manufectoring_date']
-        db = Request_Heavy_Vehical(vehicle_name=vehicle_name,company_name=company_name, vehicle_number=vehicle_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number,vehicle_image=vehicle_image,manufectoring_date=manufectoring_date,created_by = request.userId)
+        district = request.data['district']
+        state = request.data['state']
+        tehsil = request.data['tehsil']
+        db = Request_Heavy_Vehical(vehicle_name=vehicle_name,company_name=company_name, vehicle_number=vehicle_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number,vehicle_image=vehicle_image,manufectoring_date=manufectoring_date, district=district, state=state, tehsil=tehsil, created_by = request.userId)
         db.save()
         return Response({"message":"Vehicle request successfully"})
     except Exception as e:
@@ -1006,10 +1017,13 @@ def requestlacontractor(request):
         schema = {
         "labourcontractorname": {'type': 'string', 'required': True, 'nullable': False},
         "labourwork": {'type': 'string', 'required': True, 'nullable': False},
-        "lobourinnumber": {'type': 'string', 'required': True, 'nullable':False},
-        "contractorAadhar_number": {'type': 'string', 'required': True, 'nullable':False},
-        "mobile_number": {'type': 'string', 'required': True, 'nullable':False},
-        "labour_image": {'type': 'string', 'required': True, 'nullable':False}
+        "lobourinnumber": {'type': 'integer', 'required': True, 'nullable':False},
+        "contractorAadhar_number": {'type': 'integer', 'required': True, 'nullable':False},
+        "mobile_number": {'type': 'integer', 'required': True, 'nullable':False},
+        "labour_image": {'type': 'string', 'required': True, 'nullable':False},
+        "district": {'type': 'string', 'required': True, 'nullable': False},
+        "state": {'type': 'string', 'required': True, 'nullable': False},
+        "tehsil": {'type': 'string', 'required': True, 'nullable': False},
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -1025,8 +1039,11 @@ def requestlacontractor(request):
         v_contractorAadhar_number = request.data['contractorAadhar_number']
         v_mobile_number = request.data['mobile_number']
         labour_image = request.data['labour_image']
+        district = request.data['district']
+        state = request.data['state']
+        tehsil = request.data['tehsil']
         try:
-            db = Request_labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image,created_by = request.userId)
+            db = Request_labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, district=district, state=state, tehsil=tehsil, created_by = request.userId)
             db.save()
         except Exception as e:
             return Response({'error':e})
@@ -1046,8 +1063,12 @@ def requestdoperator(request):
             "driveroperatorname": {'type': 'string', 'required': True, 'nullable': False},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "alternet_mobilenumber": {'type': 'integer', 'required': False, 'nullable': True},
-            "license_number": {'type': 'integer', 'required': False, 'nullable': True},
+            "license_number": {'type': 'string', 'required': False, 'nullable': True},
             "driver_image": {'type': 'string', 'required': True, 'nullable': False},
+            "district": {'type': 'string', 'required': True, 'nullable': False},
+            "state": {'type': 'string', 'required': True, 'nullable': False},
+            "tehsil": {'type': 'string', 'required': True, 'nullable': False},
+
 
         }
         v = Validator()
@@ -1063,9 +1084,93 @@ def requestdoperator(request):
         alternet_mobilenumber = request.data['alternet_mobilenumber']
         license_number = request.data['license_number']
         driver_image = request.data['driver_image']
-        db = Request_driver_Operator(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number, driver_image=driver_image, created_by =  request.userId)
+        district = request.data['district']
+        state = request.data['state']
+        tehsil = request.data['tehsil']
+        db = Request_driver_Operator(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number, driver_image=driver_image, district=district, state=state, tehsil=tehsil, created_by =  request.userId)
         db.save()
         return Response({"message":"Request Driver operator successfully"})
+    except Exception as e:
+        print('......................deduct credit on view post....................',str(e))
+        return Response({'error':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+###############upload images vedio ############
+
+class ImageView(APIView):
+    def get(self, request, formate=None):
+        imgvedio = VedioUplaod.objects.all()
+        serializer = VedioSerailzer(imgvedio, many=True)
+        return Response({'status':'success','imgvedio':serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@isAuthenticate
+def normaluserregistration(request):
+    try:
+        schema = {
+            "vehicalname": {'type': 'string', 'required': True, 'nullable': False},
+        }
+        v = Validator()
+        if v.validate(request.data, schema):
+            return Response(requestErrorMessagesFormate(v.error), status=status.HTTP_400_BAD_REQUEST)     
+    except Exception as e:
+        return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        name = request.data['name']
+        db = NormalUser(name=name)
+        db.save()
+        return Response({"message":"Normal User Registration Successfully!"})
+
+    except Exception as e:
+        print('......................deduct credit on view post....................',str(e))
+        return Response({'error':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+from user.models import insertrecordsp
+from django.db import connection
+from django.contrib import messages
+
+def saverecordemp(request):
+    if request.method=="POST":
+        if request.POST.get('firstname') and request.POST.get('lastname') and request.POST.get('email'):
+            db = insertrecordsp()
+            db.firstname = request.POST.get('firstname')
+            print(db.firstname)
+            db.lastname = request.POST.get('lastname')
+            db.email = request.POST.get('email')
+            cursor = connection.cursor()
+            cursor.execute("call spinsertrecord('"+db.firstname+"', '"+db.lastname+"', '"+db.email+"')")
+            messages.success(request, "The Employee" +db.firstname+" Is saved successfully!")
+            return render(request, "indextrail.html")
+    else:
+        return render(request, "indextrail.html")
+        
+
+
+@api_view(['POST'])
+@isAuthenticate 
+def hvaddress(request):
+    try:
+        schema = {
+            "country_id": {'type': 'integer', 'required': True, 'nullable': False},
+            "state_id": {'type': 'integer', 'required': True, 'nullable': False},
+            "district_id": {'type': 'integer', 'required': True, 'nullable': False},
+            "city_id": {'type': 'integer', 'required': True, 'nullable': False},
+        }
+        v = Validator()
+        if not v.validate(request.data, schema):
+            return Response(requestErrorMessagesFormate(v.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        countryId = request.data['country_id']
+        stateId = request.data['state_id']
+        districtId = request.data['district_id']
+        cityId = request.data['city_id']
+        db = heavyvehicleaddress(country_id=countryId, state_id=stateId, district_id=districtId, city_id=cityId, created_by =  request.userId)
+        db.save()
+        return Response({"message":"Address Saved!"})
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
         return Response({'error':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

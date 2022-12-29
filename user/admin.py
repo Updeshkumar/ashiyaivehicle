@@ -1,10 +1,17 @@
 from django.contrib import admin
-from user.models import MasterContents, Device,Request_labour_contructor, Request_SubContractor, labour_contructor, heavyvehivalregistration,Request_driver_Operator,Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, Requirement, VedioUplaod
+from user.models import MasterContents,User,heavyvehicleaddress, Device,Request_labour_contructor, Request_SubContractor, labour_contructor,NormalUser, heavyvehivalregistration,Request_driver_Operator,Request_Heavy_Vehical, driveroperatorregistration, subcontractorregistration, Requirement, VedioUplaod
 
-
+admin.site.register(Device)
+admin.site.register(MasterContents)
 admin.site.register(Request_driver_Operator)
 admin.site.register(Request_labour_contructor)
 admin.site.register(Request_SubContractor)
+admin.site.register(User)
+admin.site.register(heavyvehicleaddress)
+
+class NormalUserAdmin(admin.ModelAdmin):
+    list_display = ['Id', 'name']
+admin.site.register(NormalUser,NormalUserAdmin)
 
 class VedioUploadAdmin(admin.ModelAdmin):
     list_display = ['Id', 'image_uplaod', 'vediourl']
@@ -32,7 +39,7 @@ class labourcontractoradmin(admin.ModelAdmin):
 admin.site.register(labour_contructor,labourcontractoradmin)
 
 class heavyvehivalregistrationAdmin(admin.ModelAdmin):
-    list_display = ['Id', 'vehical_name', 'vehical_number', 'model_number', 'ownername', 'Aadhar_number', 'vehicle_image']
+    list_display = ['Id', 'vehical_name', 'vehical_number', 'model_number', 'ownername', 'Aadhar_number', 'vehicle_image',]
 
 admin.site.register(heavyvehivalregistration,heavyvehivalregistrationAdmin)
 

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+    <title>INSERT RECORD INTO STOREPROCEDURE</title>
+</head>
+<body>
+    <center><h1>Using Store Procedure<h1>
+    <form method="POST">
+        {% csrf_token %}
+        firstname: <input type="text" name="firstname" placeholder="Enter your first name"><br>
+        lastname: <input type="text" name="lastname" placeholder="Enter your first name"><br>
+        email: <input type="text" name="email" placeholder="Enter your first name"><br>
+        <input type="submit" value="submit"/></button>
+    </hr>
+    {% if messages %}
+    {% for displaydata in messages %}
+        <h3 style="color:green;">{{displaydata}}</h3>
+    {% endfor %}
+    {% endif %}
+    </form>
+    </center>
+    </body>
