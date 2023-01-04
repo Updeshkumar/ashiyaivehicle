@@ -221,11 +221,13 @@ def filter_data(request):  # get studies
              
             _result = db.readProcedureJson('getDrivers',[pageLimit, pageOffset])
         if request.GET['type'] == 'vehicle':
-            _result = db.readProcedureJson('heavyvehicle',[])
+            _result = db.readProcedureJson('getHeavyVehicles',[])
         if request.GET['type'] == 'labour':
             _result = db.readProcedureJson('getLabours',[])
         if request.GET['type'] == 'subcontructor':
             _result = db.readProcedureJson('subcontractor',[])
+        if request.GET['type'] == 'driveroperator':
+            _result = db.readProcedureJson('driver',[])
         db.commit()
 
         if len(_result)>0:
