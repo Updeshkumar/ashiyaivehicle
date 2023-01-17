@@ -112,8 +112,8 @@ class heavyvehivalregistration(models.Model):
     vehical_number = models.CharField(max_length=500)
     ownername = models.CharField(max_length=300)
     Aadhar_number = models.CharField(max_length=20)
-    vehicle_image = models.CharField(max_length=500)
-    model_number = models.CharField(max_length=100)
+    vehicle_image = models.CharField(max_length=1000)
+    manufacture_date = models.CharField(max_length=100)
     created_by =  models.IntegerField()
     is_active = models.BooleanField(default=1,null=False)
 

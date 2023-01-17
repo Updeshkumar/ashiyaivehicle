@@ -221,13 +221,13 @@ def filter_data(request):  # get studies
              
             _result = db.readProcedureJson('getDrivers',[pageLimit, pageOffset])
         if request.GET['type'] == 'vehicle':
-            _result = db.readProcedureJson('getHeavyVehicles',[])
+            _result = db.readProcedureJson('heavyvehicle',[])
         if request.GET['type'] == 'labour':
-            _result = db.readProcedureJson('getLabours',[])
+            _result = db.readProcedureJson('labour',[])
         if request.GET['type'] == 'subcontructor':
-            _result = db.readProcedureJson('subcontractor',[])
+            _result = db.readProcedureJson('subcontrutor',[])
         if request.GET['type'] == 'driveroperator':
-            _result = db.readProcedureJson('driver',[])
+            _result = db.readProcedureJson('driveroperator',[])
         db.commit()
 
         if len(_result)>0:
@@ -753,7 +753,7 @@ def hvregistration(request):
             "ownername": {'type': 'string', 'required': False, 'nullable': True},
             "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
             "vehicle_image": {'type': 'string', 'required': False, 'nullable': True},
-            "model_number": {'type': 'string', 'required': True, 'nullable': False},
+            "manufacture_date": {'type': 'string', 'required': True, 'nullable': False},
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -770,8 +770,8 @@ def hvregistration(request):
         ownername = request.data['ownername']
         Aadhar_number = request.data['Aadhar_number']
         vehicle_image = request.data['vehicle_image']
-        model_number = request.data['model_number']
-        db = heavyvehivalregistration(vehical_name=vehical_name, company_name=company_name,model_number=model_number, vehical_number=vehical_number,ownername=ownername, Aadhar_number=Aadhar_number, vehicle_image=vehicle_image, created_by = request.userId)
+        manufacture_date = request.data['manufacture_date']
+        db = heavyvehivalregistration(vehical_name=vehical_name, manufacture_date=manufacture_date, company_name=company_name, vehical_number=vehical_number,ownername=ownername, Aadhar_number=Aadhar_number, vehicle_image=vehicle_image, created_by = request.userId)
         db.save()
         return Response({"message":"heavy vehicle register successfully"})
     except Exception as e:
@@ -793,10 +793,7 @@ def doregistration(request):
             "alternet_mobilenumber": {'type': 'integer', 'required': False, 'nullable': True},
             "license_number": {'type': 'string', 'required': False, 'nullable': True},
             "driver_image": {'type': 'string', 'required': False, 'nullable': True},
-            # "district": {'type': 'string', 'required': True, 'nullable': False},
-            # "state": {'type': 'string', 'required': True, 'nullable': False},
-            # "tehsil": {'type': 'string', 'required': True, 'nullable': False},
-
+           
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -811,15 +808,15 @@ def doregistration(request):
         alternet_mobilenumber = request.data['alternet_mobilenumber']
         license_number = request.data['license_number']
         driver_image = request.data['driver_image']
-        # district = request.data['district']
-        # state = request.data['state']
-        # tehsil = request.data['tehsil']
+        
         db = driveroperatorregistration(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number,driver_image=driver_image, created_by =  request.userId)
         db.save()
         return Response({"message":"Driver operator register successfully"})
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
         return Response({'error':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
 

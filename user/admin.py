@@ -39,7 +39,7 @@ class labourcontractoradmin(admin.ModelAdmin):
 admin.site.register(labour_contructor,labourcontractoradmin)
 
 class heavyvehivalregistrationAdmin(admin.ModelAdmin):
-    list_display = ['Id', 'vehical_name', 'vehical_number', 'model_number', 'ownername', 'Aadhar_number', 'vehicle_image',]
+    list_display = ['Id', 'vehical_name', 'vehical_number', 'ownername', 'Aadhar_number', 'vehicle_image',]
 
 admin.site.register(heavyvehivalregistration,heavyvehivalregistrationAdmin)
 
