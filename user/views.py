@@ -221,13 +221,13 @@ def filter_data(request):  # get studies
              
             _result = db.readProcedureJson('getDrivers',[pageLimit, pageOffset])
         if request.GET['type'] == 'vehicle':
-            _result = db.readProcedureJson('heavyvehicle',[])
+            _result = db.readProcedureJson('getvehicle',[request.userId])
         if request.GET['type'] == 'labour':
-            _result = db.readProcedureJson('labour',[])
+            _result = db.readProcedureJson('labour',[request.userId])
         if request.GET['type'] == 'subcontructor':
-            _result = db.readProcedureJson('subcontrutor',[])
+            _result = db.readProcedureJson('subcontrutor',[request.userId])
         if request.GET['type'] == 'driveroperator':
-            _result = db.readProcedureJson('driveroperator',[])
+            _result = db.readProcedureJson('driveroperator',[request.userId])
         db.commit()
 
         if len(_result)>0:
@@ -407,10 +407,10 @@ def send_otp_mobile(request):
         countryCode = request.data['countryCode']
         actionType = request.data['actionType']
         
-        #if OTPActionType.REGISTRATION == actionType:
-            # check if mobile number exists
-         #   if User.objects.filter(mobile_number=mobileNo).exists():
-          #      return Response({'data':"", "status":"error", 'message':Messages.MOBILE_EXISTS}, status=status.HTTP_200_OK)
+        # if OTPActionType.REGISTRATION == actionType:
+        #     #check if mobile number exists
+        #     if User.objects.filter(mobile_number=mobileNo).exists():
+        #         return Response({'data':"", "status":"error", 'message':Messages.MOBILE_EXISTS}, status=status.HTTP_200_OK)
         
         #if OTPActionType.FORGOT_PASSWORD == actionType:
             # check if mobile number exists
@@ -749,11 +749,15 @@ def hvregistration(request):
         schema = {
             "vehical_name": {'type': 'string', 'required': True, 'nullable': False},
             "company_name": {'type': 'string', 'required': True, 'nullable': False},
-            "vehical_number": {'type': 'string', 'required': True, 'nullable': False},
+            "emailId": {'type': 'string', 'required': True, 'nullable': False},
             "ownername": {'type': 'string', 'required': False, 'nullable': True},
-            "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
-            "vehicle_image": {'type': 'string', 'required': False, 'nullable': True},
+            "vehicleregistrationnumber": {'type': 'string', 'required': True, 'nullable': False},
+            "vehicle_image": {'type': 'list', 'required': False, 'nullable': True},
             "manufacture_date": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberfrontimage": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberbackimage":  {'type': 'string', 'required': True, 'nullable': False},
+            "alternativemobilenumber": {'type': 'string', 'required': True, 'nullable': False},
+            "vehiclemodelnumber": {'type': 'string', 'required': True, 'nullable': False},
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -764,14 +768,20 @@ def hvregistration(request):
         #print(request.data['Aadhar_number'])
         # Create database connection
         db = SqlQueryBuilder()
+        print(type(request.data.get('vehicle_image')),request.data.get('vehicle_image'))
         vehical_name = request.data['vehical_name']
         company_name = request.data['company_name']
-        vehical_number = request.data['vehical_number']
+        vehicleregistrationnumber = request.data['vehicleregistrationnumber']
+        emailId = request.data['emailId']
         ownername = request.data['ownername']
-        Aadhar_number = request.data['Aadhar_number']
-        vehicle_image = request.data['vehicle_image']
+        vehicle_image = json.dumps(request.data.get('vehicle_image'))
         manufacture_date = request.data['manufacture_date']
-        db = heavyvehivalregistration(vehical_name=vehical_name, manufacture_date=manufacture_date, company_name=company_name, vehical_number=vehical_number,ownername=ownername, Aadhar_number=Aadhar_number, vehicle_image=vehicle_image, created_by = request.userId)
+        Aadharnumberfrontimage = request.data['Aadharnumberfrontimage']
+        Aadharnumberbackimage = request.data['Aadharnumberbackimage']
+        alternativemobilenumber = request.data['alternativemobilenumber']
+        vehiclemodelnumber = request.data['vehiclemodelnumber']
+
+        db = heavyvehivalregistration(vehical_name=vehical_name, manufacture_date=manufacture_date, company_name=company_name, emailId=emailId,ownername=ownername,vehicleregistrationnumber=vehicleregistrationnumber, vehicle_image=vehicle_image,alternativemobilenumber=alternativemobilenumber,vehiclemodelnumber=vehiclemodelnumber,Aadharnumberfrontimage=Aadharnumberfrontimage,Aadharnumberbackimage=Aadharnumberbackimage, created_by = request.userId)
         db.save()
         return Response({"message":"heavy vehicle register successfully"})
     except Exception as e:
@@ -789,10 +799,14 @@ def doregistration(request):
             "vehicalname": {'type': 'string', 'required': True, 'nullable': False},
             "expriencesinyear": {'type': 'integer', 'required': True, 'nullable': False},
             "driveroperatorname": {'type': 'string', 'required': True, 'nullable': False},
-            "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
+            "emailId": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberfrontimage": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberbackimage":  {'type': 'string', 'required': True, 'nullable': False},
             "alternet_mobilenumber": {'type': 'integer', 'required': False, 'nullable': True},
-            "license_number": {'type': 'string', 'required': False, 'nullable': True},
+            "heavy_license": {'type': 'string', 'required': False, 'nullable': True},
             "driver_image": {'type': 'string', 'required': False, 'nullable': True},
+            "license_image": {'type': 'string', 'required': True, 'nullable': False},
+            "mobilenumber": {'type': 'string', 'required': False, 'nullable': True},
            
         }
         v = Validator()
@@ -804,12 +818,19 @@ def doregistration(request):
         vehicalname = request.data['vehicalname']
         expriencesinyear = request.data['expriencesinyear']
         driveroperatorname = request.data['driveroperatorname']
-        Aadhar_number = request.data['Aadhar_number']
+        emailId = request.data['emailId']
+        Aadharnumberfrontimage = request.data['Aadharnumberfrontimage']
+        Aadharnumberbackimage = request.data['Aadharnumberbackimage']
         alternet_mobilenumber = request.data['alternet_mobilenumber']
-        license_number = request.data['license_number']
+        heavy_license = request.data['heavy_license']
+        license_image = request.data['license_image']
         driver_image = request.data['driver_image']
+        mobilenumber = request.data['mobilenumber']
         
-        db = driveroperatorregistration(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number,driver_image=driver_image, created_by =  request.userId)
+        db = driveroperatorregistration(vehicalname=vehicalname, expriencesinyear=expriencesinyear,
+         driveroperatorname=driveroperatorname, emailId=emailId,license_image=license_image,
+          alternet_mobilenumber=alternet_mobilenumber,mobilenumber=mobilenumber,Aadharnumberfrontimage=Aadharnumberfrontimage,
+          Aadharnumberbackimage=Aadharnumberbackimage,heavy_license=heavy_license,driver_image=driver_image, created_by =  request.userId)
         db.save()
         return Response({"message":"Driver operator register successfully"})
     except Exception as e:
@@ -829,10 +850,14 @@ def subcregistration(request):
         schema = {
             "contractorname": {'type': 'string', 'required': True, 'nullable': False},
             "firmname": {'type': 'string', 'required': True, 'nullable': False},
+            "typeofwork": {'type': 'string', 'required': True, 'nullable': False},
             "expriencesinyear": {'type': 'integer', 'required': True, 'nullable': False},
             "license_number": {'type': 'string', 'required': True, 'nullable': False},
-            "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
-            "subcontractor_image": {'type': 'string', 'required': False, 'nullable': True},
+            "emailId": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberfrontimage": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberbackimage":  {'type': 'string', 'required': True, 'nullable': False},
+            "mobilenumber": {'type': 'string', 'required': True, 'nullable': False},
+            "subcontractor_image": {'type': 'list', 'required': False, 'nullable': True},
            
         }
         v = Validator()
@@ -845,12 +870,16 @@ def subcregistration(request):
         db = SqlQueryBuilder()
         contractorname = request.data['contractorname']
         firmname = request.data['firmname']
+        typeofwork = request.data['typeofwork']
         expriencesinyear = request.data['expriencesinyear']
         license_number = request.data['license_number']
-        Aadhar_number = request.data['Aadhar_number']
-        subcontractor_image = request.data['subcontractor_image']
+        emailId = request.data['emailId']
+        Aadharnumberfrontimage = request.data['Aadharnumberfrontimage']
+        Aadharnumberbackimage = request.data['Aadharnumberbackimage']
+        mobilenumber = request.data['mobilenumber']
+        subcontractor_image = json.dumps(request.data.get('subcontractor_image'))
         
-        db = subcontractorregistration(contractorname=contractorname, firmname=firmname, expriencesinyear=expriencesinyear, license_number=license_number, Aadhar_number=Aadhar_number, subcontractor_image=subcontractor_image, created_by = request.userId)
+        db = subcontractorregistration(contractorname=contractorname, firmname=firmname,typeofwork=typeofwork, expriencesinyear=expriencesinyear, license_number=license_number, emailId=emailId,Aadharnumberfrontimage=Aadharnumberfrontimage,Aadharnumberbackimage=Aadharnumberbackimage,mobilenumber=mobilenumber, subcontractor_image=subcontractor_image, created_by = request.userId)
         db.save()
         return Response({"message":"sub contractor  registration successfully"})
     except Exception as e:
@@ -867,10 +896,12 @@ def reqsubcon(request):
         schema = {
             "contractorname": {'type': 'string', 'required': True, 'nullable': False},
             "firmname": {'type': 'string', 'required': True, 'nullable': False},
+            "typeofwork": {'type': 'string', 'required': True, 'nullable': False},
             "expriencesinyear": {'type': 'integer', 'required': True, 'nullable': False},
             "license_number": {'type': 'string', 'required': True, 'nullable': False},
-            "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
-            "subcontractor_image": {'type': 'string', 'required': True, 'nullable': False},
+            "emailId": {'type': 'string', 'required': True, 'nullable': False},
+            "mobilenumber": {'type': 'string', 'required': True, 'nullable': False},
+            "subcontractor_image": {'type': 'list', 'required': True, 'nullable': False},
 
         }
         v = Validator()
@@ -883,12 +914,14 @@ def reqsubcon(request):
         db = SqlQueryBuilder()
         contractorname = request.data['contractorname']
         firmname = request.data['firmname']
+        typeofwork = request.data['typeofwork']
         expriencesinyear = request.data['expriencesinyear']
         license_number = request.data['license_number']
-        Aadhar_number = request.data['Aadhar_number']
-        subcontractor_image = request.data['subcontractor_image']
-        db = Request_SubContractor(contractorname=contractorname, firmname=firmname, expriencesinyear=expriencesinyear, license_number=license_number, Aadhar_number=Aadhar_number, subcontractor_image=subcontractor_image, created_by = request.userId)
-        print(db)
+        emailId = request.data['emailId']
+        mobilenumber = request.data['mobilenumber']
+        subcontractor_image = json.dumps(request.data.get('subcontractor_image'))
+
+        db = Request_SubContractor(contractorname=contractorname, firmname=firmname,typeofwork=typeofwork, expriencesinyear=expriencesinyear, license_number=license_number, emailId=emailId,mobilenumber=mobilenumber, subcontractor_image=subcontractor_image, created_by = request.userId)
         db.save()
 
         return Response({"message":"Request sub contractor successfully"})
@@ -908,9 +941,15 @@ def lacoregistration(request):
         "labourcontractorname": {'type': 'string', 'required': True, 'nullable': False},
         "labourwork": {'type': 'string', 'required': True, 'nullable': False},
         "lobourinnumber": {'type': 'integer', 'required': True, 'nullable':False},
-        "contractorAadhar_number": {'type': 'integer', 'required': True, 'nullable':False},
+        "Aadharnumberfrontimage": {'type': 'string', 'required': True, 'nullable': False},
+        "Aadharnumberbackimage":  {'type': 'string', 'required': True, 'nullable': False},
         "mobile_number": {'type': 'integer', 'required': True, 'nullable':False},
-        "labour_image": {'type': 'string', 'required': False, 'nullable': True},
+        "alternativemobilenumber": {'type': 'string', 'required': True, 'nullable':False},
+        "labour_image": {'type': 'string', 'required': True, 'nullable': False},
+        "skilled_labour": {'type': 'integer', 'required': True, 'nullable':False},
+        "unskilled_labour": {'type': 'integer', 'required': True, 'nullable':False},
+        "emailId": {'type': 'string', 'required': False, 'nullable':True},
+        "professional_labour": {'type': 'integer', 'required': True, 'nullable':False},
         }
         v = Validator()
         if not v.validate(request.data, schema):
@@ -923,12 +962,20 @@ def lacoregistration(request):
         v_labourcontractorname = request.data['labourcontractorname']
         v_labourwork = request.data['labourwork']
         v_lobourinnumber = request.data['lobourinnumber']
-        v_contractorAadhar_number = request.data['contractorAadhar_number']
         v_mobile_number = request.data['mobile_number']
+        alternativemobilenumber = request.data['alternativemobilenumber']
+        Aadharnumberfrontimage = request.data['Aadharnumberfrontimage']
+        Aadharnumberbackimage = request.data['Aadharnumberbackimage']
         labour_image = request.data['labour_image']
+        emailId = request.data['emailId']
+        skilled_labour = request.data['skilled_labour']
+        unskilled_labour = request.data['unskilled_labour']
+        professional_labour = request.data['professional_labour']
         
         try:
-            db = labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, created_by = request.userId)
+            db = labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber,professional_labour=professional_labour,
+                alternativemobilenumber=alternativemobilenumber, Aadharnumberfrontimage=Aadharnumberfrontimage,Aadharnumberbackimage=Aadharnumberbackimage,
+                 mobile_number=v_mobile_number, labour_image=labour_image,emailId=emailId,skilled_labour=skilled_labour,unskilled_labour=unskilled_labour, created_by = request.userId)
             db.save()
         except Exception as e:
             return Response({'error':e})
@@ -936,6 +983,8 @@ def lacoregistration(request):
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
         return Response({'error': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
 ################all request ##########
@@ -955,15 +1004,17 @@ class ProfileView(APIView):
 def requesthvregistration(request):
     try:
         schema = {
-            "vehicle_name": {'type': 'string', 'required': True, 'nullable': False},
+           "vehical_name": {'type': 'string', 'required': True, 'nullable': False},
             "company_name": {'type': 'string', 'required': True, 'nullable': False},
-            "vehicle_number": {'type': 'string', 'required': True, 'nullable': False},
-            "model_number": {'type': 'string', 'required': False, 'nullable': True},
+            "email": {'type': 'string', 'required': True, 'nullable': False},
             "ownername": {'type': 'string', 'required': False, 'nullable': True},
-            "Aadhar_number": {'type': 'integer', 'required': False, 'nullable': True},
-            "vehicle_image": {'type': 'string', 'required': False, 'nullable': True},
-            "manufectoring_date": {'type': 'string', 'required': False, 'nullable': True},
-            
+            "vehicleregistrationnumber": {'type': 'string', 'required': True, 'nullable': False},
+            "vehicle_image": {'type': 'list', 'required': False, 'nullable': True},
+            "manufacture_date": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberfrontimage": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberbackimage":  {'type': 'string', 'required': True, 'nullable': False},
+            "alternativemobilenumber": {'type': 'string', 'required': True, 'nullable': False},
+            "vehiclemodelnumber": {'type': 'string', 'required': True, 'nullable': False},
 
         }
         v = Validator()
@@ -972,24 +1023,30 @@ def requesthvregistration(request):
     except Exception as e:
         return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        #print(request.data['Aadhar_number'])
         # Create database connection
         db = SqlQueryBuilder()
-        vehicle_name = request.data['vehicle_name']
+        print(type(request.data.get('vehicle_image')),request.data.get('vehicle_image'))
+        vehical_name = request.data['vehical_name']
         company_name = request.data['company_name']
-        vehicle_number = request.data['vehicle_number']
-        model_number = request.data['model_number']
+        vehicleregistrationnumber = request.data['vehicleregistrationnumber']
+        email = request.data['email']
         ownername = request.data['ownername']
-        Aadhar_number = request.data['Aadhar_number']
-        vehicle_image = request.data['vehicle_image']
-        manufectoring_date = request.data['manufectoring_date']
-        db = Request_Heavy_Vehical(vehicle_name=vehicle_name,company_name=company_name, vehicle_number=vehicle_number, model_number=model_number,ownername=ownername, Aadhar_number=Aadhar_number,vehicle_image=vehicle_image,manufectoring_date=manufectoring_date, created_by = request.userId)
+        vehicle_image = json.dumps(request.data.get('vehicle_image'))
+        manufacture_date = request.data['manufacture_date']
+        Aadharnumberfrontimage = request.data['Aadharnumberfrontimage']
+        Aadharnumberbackimage = request.data['Aadharnumberbackimage']
+        alternativemobilenumber = request.data['alternativemobilenumber']
+        vehiclemodelnumber = request.data['vehiclemodelnumber']
+
+        db = Request_Heavy_Vehical(vehical_name=vehical_name, manufacture_date=manufacture_date, company_name=company_name, email=email,ownername=ownername,vehicleregistrationnumber=vehicleregistrationnumber, vehicle_image=vehicle_image,alternativemobilenumber=alternativemobilenumber,vehiclemodelnumber=vehiclemodelnumber,Aadharnumberfrontimage=Aadharnumberfrontimage,Aadharnumberbackimage=Aadharnumberbackimage, created_by = request.userId)
         db.save()
-        return Response({"message":"Vehicle request successfully"})
+        return Response({"message":"heavy vehicle register successfully"})
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
         return Response({'error': Messages.SOMETHING_WENT_WRONG}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+    
+
+
         
 @api_view(['POST'])
 @isAuthenticate 
@@ -999,9 +1056,14 @@ def requestlacontractor(request):
         "labourcontractorname": {'type': 'string', 'required': True, 'nullable': False},
         "labourwork": {'type': 'string', 'required': True, 'nullable': False},
         "lobourinnumber": {'type': 'integer', 'required': True, 'nullable':False},
+        "emailId": {'type': 'integer', 'required': True, 'nullable':False},
         "contractorAadhar_number": {'type': 'integer', 'required': True, 'nullable':False},
         "mobile_number": {'type': 'integer', 'required': True, 'nullable':False},
-        "labour_image": {'type': 'string', 'required': True, 'nullable':False},
+        "alternativemobilenumber": {'type': 'string', 'required': True, 'nullable': False},
+        "skilled_labour": {'type': 'integer', 'required': True, 'nullable':False},
+        "unskilled_labour": {'type': 'integer', 'required': True, 'nullable':False},
+        "professional_labour": {'type': 'integer', 'required': True, 'nullable':False},
+        "labour_image": {'type': 'list', 'required': True, 'nullable':False},
         
         }
         v = Validator()
@@ -1015,12 +1077,19 @@ def requestlacontractor(request):
         v_labourcontractorname = request.data['labourcontractorname']
         v_labourwork = request.data['labourwork']
         v_lobourinnumber = request.data['lobourinnumber']
+        emailId = request.data['emailId']
+        skilled_labour = request.data['skilled_labour']
+        unskilled_labour = request.data['unskilled_labour']
+        # professional_labour = request.data['professional_labour']
         v_contractorAadhar_number = request.data['contractorAadhar_number']
         v_mobile_number = request.data['mobile_number']
-        labour_image = request.data['labour_image']
+        alternativemobilenumber = request.data['alternativemobilenumber']
+        labour_image = json.dumps(request.data.get('labour_image'))
         
         try:
-            db = Request_labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, mobile_number=v_mobile_number, labour_image=labour_image, created_by = request.userId)
+            db = Request_labour_contructor(labourcontractorname=v_labourcontractorname,alternativemobilenumber=alternativemobilenumber, 
+                                           labourwork=v_labourwork, lobourinnumber=v_lobourinnumber, contractorAadhar_number=v_contractorAadhar_number, 
+                                           mobile_number=v_mobile_number,emailId=emailId,skilled_labour=skilled_labour,unskilled_labour=unskilled_labour, labour_image=labour_image, created_by = request.userId)
             db.save()
         except Exception as e:
             return Response({'error':e})
@@ -1042,6 +1111,7 @@ def requestdoperator(request):
             "alternet_mobilenumber": {'type': 'integer', 'required': False, 'nullable': True},
             "license_number": {'type': 'string', 'required': False, 'nullable': True},
             "driver_image": {'type': 'string', 'required': True, 'nullable': False},
+            "mobilenumber": {'type': 'string', 'required': True, 'nullable': False},
             
 
         }
@@ -1057,9 +1127,12 @@ def requestdoperator(request):
         Aadhar_number = request.data['Aadhar_number']
         alternet_mobilenumber = request.data['alternet_mobilenumber']
         license_number = request.data['license_number']
+        mobilenumber = request.data['mobilenumber']
         driver_image = request.data['driver_image']
         
-        db = Request_driver_Operator(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname, Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber, license_number=license_number, driver_image=driver_image, created_by =  request.userId)
+        db = Request_driver_Operator(vehicalname=vehicalname, expriencesinyear=expriencesinyear, driveroperatorname=driveroperatorname,
+         Aadhar_number=Aadhar_number, alternet_mobilenumber=alternet_mobilenumber,
+          license_number=license_number, driver_image=driver_image, mobilenumber=mobilenumber, created_by =  request.userId)
         db.save()
         return Response({"message":"Request Driver operator successfully"})
     except Exception as e:
@@ -1089,7 +1162,7 @@ def normaluserregistration(request):
         return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
     try:
         name = request.data['name']
-        db = NormalUser(name=name)
+        db = NormalUser(name=name, created_by =  request.userId)
         db.save()
         return Response({"message":"Normal User Registration Successfully!"})
 
