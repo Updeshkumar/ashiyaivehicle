@@ -741,7 +741,7 @@ def uploadFile(request):
     except Exception as e:
         return Response({"message":"failed", "status":"failed", "err":e})
 ################heavyVehicalregistrations ##########
-
+#######################
 @api_view(['POST'])
 @isAuthenticate 
 def hvregistration(request):
