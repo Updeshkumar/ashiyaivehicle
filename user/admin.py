@@ -28,12 +28,12 @@ admin.site.register(Request_Heavy_Vehical)
 
 #admin.site.register(subcontractorregistration)
 
+admin.site.register(labour_contructor)
 
+# class labourcontractoradmin(admin.ModelAdmin):
+#     list_display = ['Id','labourcontractorname', 'labourwork', 'lobourinnumber', 'mobile_number',]
 
-class labourcontractoradmin(admin.ModelAdmin):
-    list_display = ['Id','labourcontractorname', 'labourwork', 'lobourinnumber', 'mobile_number',]
-
-admin.site.register(labour_contructor,labourcontractoradmin)
+# admin.site.register(labour_contructor,labourcontractoradmin)
 
 class heavyvehivalregistrationAdmin(admin.ModelAdmin):
     list_display = ['Id', 'vehical_name', 'ownername', 'vehicleregistrationnumber', 'vehicle_image',]

@@ -938,52 +938,49 @@ def reqsubcon(request):
 def lacoregistration(request):
     try:
         schema = {
-        "labourcontractorname": {'type': 'string', 'required': True, 'nullable': False},
-        "labourwork": {'type': 'string', 'required': True, 'nullable': False},
-        "lobourinnumber": {'type': 'integer', 'required': True, 'nullable':False},
-        "Aadharnumberfrontimage": {'type': 'string', 'required': True, 'nullable': False},
-        "Aadharnumberbackimage":  {'type': 'string', 'required': True, 'nullable': False},
-        "mobile_number": {'type': 'integer', 'required': True, 'nullable':False},
-        "alternativemobilenumber": {'type': 'string', 'required': True, 'nullable':False},
-        "labour_image": {'type': 'string', 'required': True, 'nullable': False},
-        "skilled_labour": {'type': 'integer', 'required': True, 'nullable':False},
-        "unskilled_labour": {'type': 'integer', 'required': True, 'nullable':False},
-        "emailId": {'type': 'string', 'required': False, 'nullable':True},
-        "professional_labour": {'type': 'integer', 'required': True, 'nullable':False},
+            "labourcontractorname": {'type': 'string', 'required': True, 'nullable': False},
+            "labourwork": {'type': 'string', 'required': True, 'nullable': False},
+            "lobourinnumber": {'type': 'string', 'required': True, 'nullable': False},
+            "mobile_number": {'type': 'string', 'required': True, 'nullable': False},
+            "alternativemobilenumber": {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberbackimage":  {'type': 'string', 'required': True, 'nullable': False},
+            "Aadharnumberfrontimage": {'type': 'string', 'required': True, 'nullable': False},
+            "labour_image": {'type': 'string', 'required': True, 'nullable': False},
+            "skilledlabour": {'type': 'integer', 'required': True, 'nullable': False},
+            "unskilledlabour": {'type': 'integer', 'required': True, 'nullable': False},
+            "professionallabour": {'type': 'integer', 'required': True, 'nullable': False},
+            "emailId": {'type': 'string', 'required': True, 'nullable': False},
         }
         v = Validator()
         if not v.validate(request.data, schema):
             return Response(requestErrorMessagesFormate(v.errors), status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    
     try:
-        
-        v_labourcontractorname = request.data['labourcontractorname']
-        v_labourwork = request.data['labourwork']
-        v_lobourinnumber = request.data['lobourinnumber']
-        v_mobile_number = request.data['mobile_number']
+        labourcontractorname = request.data['labourcontractorname']
+        labourwork = request.data['labourwork']
+        lobourinnumber = request.data['lobourinnumber']
+        mobile_number = request.data['mobile_number']
         alternativemobilenumber = request.data['alternativemobilenumber']
         Aadharnumberfrontimage = request.data['Aadharnumberfrontimage']
         Aadharnumberbackimage = request.data['Aadharnumberbackimage']
+        skilledlabour = request.data['skilledlabour']
         labour_image = request.data['labour_image']
+        unskilledlabour = request.data['unskilledlabour']
+        professionallabour = request.data['professionallabour']
         emailId = request.data['emailId']
-        skilled_labour = request.data['skilled_labour']
-        unskilled_labour = request.data['unskilled_labour']
-        professional_labour = request.data['professional_labour']
         
-        try:
-            db = labour_contructor(labourcontractorname=v_labourcontractorname, labourwork=v_labourwork, lobourinnumber=v_lobourinnumber,professional_labour=professional_labour,
-                alternativemobilenumber=alternativemobilenumber, Aadharnumberfrontimage=Aadharnumberfrontimage,Aadharnumberbackimage=Aadharnumberbackimage,
-                 mobile_number=v_mobile_number, labour_image=labour_image,emailId=emailId,skilled_labour=skilled_labour,unskilled_labour=unskilled_labour, created_by = request.userId)
-            db.save()
-        except Exception as e:
-            return Response({'error':e})
-        return Response({"message":"Lobour contractor registrations successfully"})
+        db = labour_contructor(labourcontractorname=labourcontractorname,labourwork=labourwork,skilledlabour=skilledlabour,emailId=emailId,
+        Aadharnumberfrontimage=Aadharnumberfrontimage,Aadharnumberbackimage=Aadharnumberbackimage,mobile_number=mobile_number,alternativemobilenumber=alternativemobilenumber,
+       professionallabour=professionallabour,labour_image=labour_image,unskilledlabour=unskilledlabour, lobourinnumber=lobourinnumber,created_by =  request.userId)
+        db.save()
+        return Response({"message":"Labour contructor register successfully"})
     except Exception as e:
         print('......................deduct credit on view post....................',str(e))
-        return Response({'error': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+    
 
 
 
